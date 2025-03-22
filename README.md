@@ -1,19 +1,20 @@
 # Gemini Chatbot with FastAPI and Streamlit
 
-A simple chatbot demo using Google's Gemini 1.5 Flash model with a FastAPI backend and Streamlit frontend.
+A modern chatbot application using Google's Gemini models with a FastAPI backend and Streamlit frontend.
 
 ![Gemini Chatbot Screenshot](images/image.png)
 
 ## Features
 
-- FastAPI backend with Gemini 1.5 Flash integration
-- Streamlit frontend with a clean, modern chat interface
+- FastAPI backend with multiple Gemini model support (1.5 Flash, 1.5 Pro, 2.0 Flash-Lite, 2.0 Flash)
+- Sleek Streamlit frontend with a modern, responsive UI
+- Interactive model selection with different capabilities for various use cases
 - Conversation history maintained during the session
-- One-click conversation reset button
-- Responsive design with custom styling
+- One-click conversation reset
+- Token usage tracking with visual indicators
+- System health monitoring and available models display
+- Custom styling with dark mode theme
 - Pydantic models for structured data validation
-- Token usage tracking
-- System health monitoring
 
 ## Logs Visualization
 
@@ -68,20 +69,29 @@ Using the integrated run script (recommended):
 python run_app.py
 ```
 
-The application runs on:
+The application runs on hardcoded ports:
 - Backend (FastAPI): http://localhost:8000
 - Frontend (Streamlit): http://localhost:8500
 
-### Testing the Application
+To access the API documentation, visit:
+- API Docs: http://localhost:8000/docs
+
+### Using the Application
 
 1. Open http://localhost:8500 in your browser
-2. Type a message in the chat input
-3. View token usage and system status in the sidebar
+2. Select your preferred Gemini model from the sidebar dropdown:
+   - Gemini 1.5 Flash: Balanced speed and capabilities (default)
+   - Gemini 1.5 Pro: Advanced reasoning for complex tasks
+   - Gemini 2.0 Flash-Lite: Efficient processing
+   - Gemini 2.0 Flash: Latest capabilities with improved performance
+3. Type your messages in the chat input
+4. Monitor token usage and system status in the sidebar
+5. Clear the conversation history when needed
 
 ## Project Structure
 
-- `backend.py`: FastAPI server with Gemini API integration
-- `frontend.py`: Streamlit UI for the chat interface
+- `backend.py`: FastAPI server with Gemini API integration and model management
+- `frontend.py`: Streamlit UI with model selection and chat interface
 - `run_app.py`: Script to start both services
 - `requirements.txt`: Python dependencies
 
@@ -101,7 +111,8 @@ Request body:
       "role": "user",
       "content": "Hello, how are you?"
     }
-  ]
+  ],
+  "model": "gemini-1.5-pro"
 }
 ```
 
@@ -124,8 +135,39 @@ Response:
 GET /health
 ```
 
+Response:
+```json
+{
+  "status": "healthy",
+  "model": "gemini-1.5-flash",
+  "available_models": ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite", "gemini-2.0-flash"],
+  "version": "1.0.0",
+  "timestamp": "2023-05-01T12:00:00.000Z"
+}
+```
+
 ### List Models
 
 ```
 GET /models
-``` 
+```
+
+## Future Enhancements
+
+Potential improvements for future versions:
+- Multimodal support for image processing
+- Chat history persistence across sessions
+- User authentication and personalized conversations
+- Fine-tuning options for specific use cases
+- Advanced prompt engineering tools
+- Response streaming for faster interactions
+
+## License
+
+MIT
+
+## Acknowledgements
+
+- Google Generative AI for the Gemini models
+- FastAPI for the backend framework
+- Streamlit for the frontend interface 

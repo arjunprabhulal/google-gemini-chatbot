@@ -37,14 +37,25 @@ if not GOOGLE_API_KEY:
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# Setup the model - using only gemini-1.5-flash
-MODEL_NAME = "gemini-1.5-flash"
+# Define a dictionary of supported models
+SUPPORTED_MODELS = {
+    "gemini-1.5-flash": "gemini-1.5-flash",
+    "gemini-1.5-pro": "gemini-1.5-pro",
+    "gemini-2.0-flash-lite": "gemini-2.0-flash-lite",
+    "gemini-2.0-flash": "gemini-2.0-flash"
+}
+
+# Default model
+DEFAULT_MODEL = "gemini-1.5-flash"
+model_instances = {}
+
+# Initialize the default model
 try:
-    model = genai.GenerativeModel(MODEL_NAME)
-    print(f"Using model: {MODEL_NAME}")
+    model_instances[DEFAULT_MODEL] = genai.GenerativeModel(DEFAULT_MODEL)
+    print(f"Using default model: {DEFAULT_MODEL}")
 except Exception as e:
-    print(f"Warning: Failed to initialize {MODEL_NAME}: {str(e)}")
-    model = None
+    print(f"Warning: Failed to initialize {DEFAULT_MODEL}: {str(e)}")
+    model_instances[DEFAULT_MODEL] = None
 
 # Define model-related classes
 class ModelInfo(BaseModel):
@@ -80,6 +91,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
+    model: Optional[str] = "gemini-1.5-flash"
     
     @field_validator('messages')
     @classmethod
@@ -96,17 +108,37 @@ class ChatResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: Literal["healthy", "unhealthy"]
     model: str
+    available_models: List[str]
     version: str = "1.0.0"
     timestamp: datetime = Field(default_factory=datetime.now)
 
 # Chat endpoint
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
+    # Get the requested model name
+    model_name = request.model
+    if model_name not in SUPPORTED_MODELS:
+        print(f"Unsupported model: {model_name}, falling back to {DEFAULT_MODEL}")
+        model_name = DEFAULT_MODEL
+    
+    # Initialize the model if it hasn't been initialized yet
+    if model_name not in model_instances:
+        try:
+            model_instances[model_name] = genai.GenerativeModel(model_name)
+            print(f"Initialized model: {model_name}")
+        except Exception as e:
+            print(f"Error initializing {model_name}: {str(e)}")
+            # Fallback to default model
+            model_name = DEFAULT_MODEL
+    
+    # Get the model instance
+    model = model_instances[model_name]
+    
     # Check if we have a working model
     if model is None:
         raise HTTPException(
             status_code=503, 
-            detail=f"Model {MODEL_NAME} is not available. Please check your API key and permissions."
+            detail=f"Model {model_name} is not available. Please check your API key and permissions."
         )
             
     # Extract the user's most recent message
@@ -142,7 +174,12 @@ async def chat(request: ChatRequest):
 # Health check endpoint
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    return HealthResponse(status="healthy", model=MODEL_NAME)
+    available_models = [model for model, instance in model_instances.items() if instance is not None]
+    return HealthResponse(
+        status="healthy", 
+        model=DEFAULT_MODEL,
+        available_models=available_models
+    )
 
 # Endpoint to list available models
 @app.get("/models", response_model=ModelsResponse)
