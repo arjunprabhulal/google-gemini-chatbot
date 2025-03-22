@@ -2,7 +2,7 @@
 
 A modern chatbot application using Google's Gemini models with a FastAPI backend and Streamlit frontend.
 
-![Gemini Chatbot Screenshot](images/image.png)
+![Gemini Chatbot Demo](images/gemini-chatbot-demo.gif)
 
 ## Features
 
