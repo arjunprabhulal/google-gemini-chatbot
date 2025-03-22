@@ -19,9 +19,9 @@ def run_frontend():
     frontend_port = "8500"  # Hardcoded frontend port
     print(f"Starting frontend server on port {frontend_port}...")
     if os.name == 'nt':  # Windows
-        subprocess.run(["streamlit", "run", "frontend.py", "--server.port", frontend_port], check=True)
+        subprocess.run(["streamlit", "run", "frontend.py", "--server.port", frontend_port, "--server.headless", "true"], check=True)
     else:  # Unix/Linux/MacOS
-        subprocess.run(["streamlit", "run", "frontend.py", "--server.port", frontend_port], check=True)
+        subprocess.run(["streamlit", "run", "frontend.py", "--server.port", frontend_port, "--server.headless", "true"], check=True)
 
 def open_browser():
     """Open the browser after a short delay"""
@@ -44,15 +44,15 @@ if __name__ == "__main__":
             print("Warning: GOOGLE_API_KEY not set in environment variables.")
             print("The application may not work correctly.")
     
-    # Start browser opening thread
-    browser_thread = Thread(target=open_browser)
-    browser_thread.daemon = True
-    browser_thread.start()
-    
     # Start backend thread
     backend_thread = Thread(target=run_backend)
     backend_thread.daemon = True
     backend_thread.start()
+    
+    # Start browser opening thread - wait slightly longer to ensure both servers are up
+    browser_thread = Thread(target=open_browser)
+    browser_thread.daemon = True
+    browser_thread.start()
     
     # Run frontend in main thread
     try:
