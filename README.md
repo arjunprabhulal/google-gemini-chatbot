@@ -2,7 +2,7 @@
 
 A simple chatbot demo using Google's Gemini 1.5 Flash model with a FastAPI backend and Streamlit frontend.
 
-![Gemini Chatbot Screenshot](images/chatbot-screenshot.png)
+![Gemini Chatbot Screenshot](images/image.png)
 
 ## Features
 
@@ -19,7 +19,7 @@ A simple chatbot demo using Google's Gemini 1.5 Flash model with a FastAPI backe
 
 The application provides detailed logging information during runtime:
 
-![Application Logs](images/application-logs.png)
+![Application Logs](images/logs.png)
 
 ## Setup Instructions
 
